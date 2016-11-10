@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+import shutil
+import requests
+from itertools import product
+
+# Data source URL template from the San Jose online permits site
+URL_TEMPLATE = "http://www.sjpermits.org/permits/ftproot/SanJose/permitdataYears/%s"
+PERMIT_TEMPLATE = "PD_%d_%s.txt"
+
+# Years of permit data to download 
+START_YEAR = 2001
+FINAL_YEAR = 2016
+YEARS = range(START_YEAR, FINAL_YEAR)
+
+# Different report types to download
+REPORT_TYPES = ['FINAL', 'ISSUE']
+
+# Download all the files!
+permits = product(YEARS, REPORT_TYPES)
+for permit in permits:
+    # Format the URL string
+    permit_file = PERMIT_TEMPLATE % (permit[0], permit[1])
+    url = URL_TEMPLATE % permit_file
+    
+    # Fetch file from URL
+    print("Downloading `%s`..." % permit_file)
+    response = requests.get(url, stream=True)
+   
+    # Save file to `data` folder
+    with open('data/tsv/%s' % permit_file, 'wb') as out:
+        shutil.copyfileobj(response.raw, out)
+    del response
