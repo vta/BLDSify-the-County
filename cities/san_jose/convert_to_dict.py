@@ -3,7 +3,7 @@ import csv
 import json
 import six
 
-TSV_FOLDER = "../data/tsv/"
+TSV_FOLDER = "./data/san_jose/"
 FIELDNAMES = ("tract", "apn", "issue_date", "final_date", "lot", "permit_number", "owner",
               "contractor", "applicant", "location", "approval_status", "sub_code",
               "sub_code_description", "work_code", "work_code_description", "census_code",
@@ -27,13 +27,18 @@ def convert_to_dicts(label):
         return [clean_and_annotate(row, label) for row in tsv_reader]
 
 
-def run():
-    permits = {}   
+def get_san_jose_permits():
+    permits = {}
+    limit = 1
+    index = 0
     # Go through all of the files, and convert them into arrays of dicts
     for file_name in os.listdir(TSV_FOLDER):
+        print("Load " + file_name)
         if file_name.endswith(".txt"):
             label = file_name.strip(".txt")
             permits_for_file = convert_to_dicts(label)
             permits[label] = permits_for_file
-            
+        index += 1
+        if index == limit:
+            break
     return permits

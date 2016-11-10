@@ -27,6 +27,6 @@ for permit in permits:
     response = requests.get(url, stream=True)
    
     # Save file to `data` folder
-    with open('data/tsv/%s' % permit_file, 'wb') as out:
+    with open('../../data/san_jose/%s' % permit_file, 'wb') as out:
         shutil.copyfileobj(response.raw, out)
     del response

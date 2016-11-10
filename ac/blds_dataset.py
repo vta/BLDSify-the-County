@@ -1,8 +1,9 @@
 import json
+import string
 import time
-from pprint import pprint
-from amigocloud import AmigoCloud
+import uuid
 
+from amigocloud import AmigoCloud
 
 class BLDSDataset:
     """ A class to manage AmigoCloud's BLDS dataset """
@@ -19,7 +20,7 @@ class BLDSDataset:
         self.master = self.response['master']
 
     def add_column(self, column_json):
-        print "Add column: " + column_json["name"]
+        print("Add column: " + column_json["name"])
         add_column = {
             "type": "DDL",
             "entity": self.table_name,
@@ -33,16 +34,17 @@ class BLDSDataset:
         }
         response = self.ac.post(self.dataset['submit_change'],
                    {'change': json.dumps(add_column)})
-        time.sleep(1) # to prevent Error: TOO MANY REQUESTS
+        time.sleep(5) # to prevent Error: TOO MANY REQUESTS
 
     def create_schema(self):
+        print("Create schema for " + self.table_name)
         columns = [
             # Required fields
             {
                 "name": "permit_num",
                 "visible": True,
                 "default": None,
-                "nullable": False,
+                "nullable": True,
                 "editable": True,
                 "alias": "PermitNum",
                 "type": "string"
@@ -51,7 +53,7 @@ class BLDSDataset:
                 "name": "description",
                 "visible": True,
                 "default": None,
-                "nullable": False,
+                "nullable": True,
                 "editable": True,
                 "alias": "Description",
                 "type": "string"
@@ -87,7 +89,7 @@ class BLDSDataset:
                 "name": "status_current",
                 "visible": True,
                 "default": None,
-                "nullable": False,
+                "nullable": True,
                 "editable": True,
                 "alias": "StatusCurrent",
                 "type": "string"
@@ -96,7 +98,7 @@ class BLDSDataset:
                 "name": "original_address1",
                 "visible": True,
                 "default": None,
-                "nullable": False,
+                "nullable": True,
                 "editable": True,
                 "alias": "OriginalAddress1",
                 "type": "string"
@@ -397,7 +399,7 @@ class BLDSDataset:
                 "editable": True,
                 "visible": True,
                 "alias": "TotalSqFt",
-                "type": "integer"
+                "type": "float"
             },
             {
                 "name": "contractor_state_lic",
@@ -463,7 +465,7 @@ class BLDSDataset:
                 "editable": True,
                 "visible": True,
                 "alias": "AddedSqFt",
-                "type": "integer"
+                "type": "float"
             },
             {
                 "name": "removed_sqft",
@@ -474,7 +476,7 @@ class BLDSDataset:
                 "editable": True,
                 "visible": True,
                 "alias": "RemovedSqFt",
-                "type": "integer"
+                "type": "float"
             },
             {
                 "name": "master_permit_num",
@@ -618,7 +620,7 @@ class BLDSDataset:
                 "nullable": True,
                 "editable": True,
                 "alias": "Fee",
-                "type": "integer"
+                "type": "float"
             },
             {
                 "name": "contractor_full_name",
@@ -705,4 +707,41 @@ class BLDSDataset:
         for column in columns:
             self.add_column(column)
 
-    def upload_record(self):
+    def upload_records(self, records, city):
+        insert_records = {
+            "type": "DML",
+            "entity": self.table_name,
+            "action": "INSERT",
+            "data": records
+        }
+        # print insert_record
+        response = self.ac.post(self.dataset['submit_change'],
+                       {'change': json.dumps(insert_records)})
+        print("Upload " + str(len(records)) + " records to " + self.table_name + ", response: " + response)
+        time.sleep(10)
+
+    def get_record_obj(self, record, city):
+        obj = dict()
+        for field_name, value in record.iteritems():
+            blds_filed = city.get_field(field_name)
+            blds_value = city.get_value(value)
+            if blds_filed:
+                obj[blds_filed] = blds_value
+        u = uuid.uuid1()
+        new_obj = {"new": obj}
+        new_obj["amigo_id"] = u.hex
+        return new_obj
+
+    def upload_permits(self, permits, city):
+        records = []
+        index = 0
+        for key, value in permits.iteritems():
+            for p in value:
+                records.append(self.get_record_obj(p, city))
+                index += 1
+                if index >= 1000:
+                    self.upload_records(records, city)
+                    records[:] = []
+                    index = 0
+        # Upload the rest of the records
+        self.upload_records(records, city)
