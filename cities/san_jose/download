@@ -8,7 +8,7 @@ URL_TEMPLATE = "http://www.sjpermits.org/permits/ftproot/SanJose/permitdataYears
 PERMIT_TEMPLATE = "PD_%d_%s.txt"
 
 # Years of permit data to download 
-START_YEAR = 2001
+START_YEAR = 2010
 FINAL_YEAR = 2016
 YEARS = range(START_YEAR, FINAL_YEAR)
 

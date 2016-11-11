@@ -717,7 +717,7 @@ class BLDSDataset:
         # print insert_record
         response = self.ac.post(self.dataset['submit_change'],
                        {'change': json.dumps(insert_records)})
-        print("Upload " + str(len(records)) + " records to " + self.table_name + ", response: " + response)
+        print("Upload " + str(len(records)) + " records to " + self.table_name)
         time.sleep(10)
 
     def get_record_obj(self, record, city):
