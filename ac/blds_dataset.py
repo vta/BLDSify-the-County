@@ -716,9 +716,9 @@ class BLDSDataset:
         }
         # print insert_record
         response = self.ac.post(self.dataset['submit_change'],
-                       {'change': json.dumps(insert_records)})
+                       {'change': unicode(json.dumps(insert_records), errors='ignore')})
         print("Upload " + str(len(records)) + " records to " + self.table_name)
-        time.sleep(10)
+        time.sleep(10) # to prevent Error: TOO MANY REQUESTS
 
     def get_record_obj(self, record, city):
         obj = dict()
