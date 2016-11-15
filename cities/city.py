@@ -11,5 +11,5 @@ class City:
         else:
             return None
 
-    def get_value(self, value):
+    def get_value(self, field_name, value, record):
         return value

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+wget -O "../../data/palo_alto/data.csv" "http://data.cityofpaloalto.org/rest/datastreams/89070/data.csv"

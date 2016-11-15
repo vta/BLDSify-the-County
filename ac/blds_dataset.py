@@ -39,6 +39,16 @@ class BLDSDataset:
     def create_schema(self):
         print("Create schema for " + self.table_name)
         columns = [
+            # Geometry field
+            {
+                "name": "wkb_geometry",
+                "visible": True,
+                "geometry_type": "POINT",
+                "nullable": True,
+                "editable": True,
+                "alias": "wkb geometry",
+                "type": "geometry"
+            },
             # Required fields
             {
                 "name": "permit_num",
@@ -717,6 +727,7 @@ class BLDSDataset:
         # print insert_record
         response = self.ac.post(self.dataset['submit_change'],
                        {'change': unicode(json.dumps(insert_records), errors='ignore')})
+        print(response)
         print("Upload " + str(len(records)) + " records to " + self.table_name)
         time.sleep(10) # to prevent Error: TOO MANY REQUESTS
 
@@ -724,7 +735,7 @@ class BLDSDataset:
         obj = dict()
         for field_name, value in record.iteritems():
             blds_filed = city.get_field(field_name)
-            blds_value = city.get_value(value)
+            blds_value = city.get_value(field_name, value, record)
             if blds_filed:
                 obj[blds_filed] = blds_value
         u = uuid.uuid1()

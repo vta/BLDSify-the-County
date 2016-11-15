@@ -29,7 +29,7 @@ def convert_to_dicts(label):
 
 def get_san_jose_permits():
     permits = {}
-    limit = 50
+    limit = 1
     index = 0
     # Go through all of the files, and convert them into arrays of dicts
     for file_name in os.listdir(TSV_FOLDER):
