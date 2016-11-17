@@ -37,8 +37,6 @@ def convert_to_dicts(label):
 
 def get_palo_alto_permits():
     permits = {}
-    # Go through all of the files, and convert them into arrays of dicts
-#    for file_name in os.listdir(TSV_FOLDER):
     label = 'data'
     print("Load " + TSV_DATA)
     permits_for_file = convert_to_dicts(label)

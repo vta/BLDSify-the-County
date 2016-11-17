@@ -11,6 +11,8 @@ class BLDSDataset:
     dataset_url = '/users/{user_id}/projects/{project_id}/datasets/{dataset_id}'
 
     def __init__(self, project_id, dataset_id, token):
+        self.project_id = project_id
+        self.dataset_id = dataset_id
         self.ac = AmigoCloud(token=token)
         self.dataset = self.ac.get(self.dataset_url.format(user_id=1,
                                         project_id=project_id,
@@ -26,19 +28,36 @@ class BLDSDataset:
             "entity": self.table_name,
             "action": "ADD COLUMN",
             "parent": self.master,
-            "data": [
-                {
-                    "new": column_json
-                }
-            ]
+            "data": [{"new": column_json}]
         }
         response = self.ac.post(self.dataset['submit_change'],
                    {'change': json.dumps(add_column)})
         time.sleep(5) # to prevent Error: TOO MANY REQUESTS
 
+    def add_columns(self, columns_json):
+        # print("Add column: " + column_json["name"])
+        print("Add columns")
+        add_column = {
+            "type": "DDL",
+            "entity": self.table_name,
+            "action": "ADD COLUMN",
+            "parent": self.master,
+            "data": columns_json
+        }
+        response = self.ac.post(self.dataset['submit_change'],
+                   {'change': json.dumps(add_column)})
+
     def create_schema(self):
         print("Create schema for " + self.table_name)
         columns = [
+            # {
+            #     "name": "amigo_id",
+            #     "nullable": False,
+            #     "default": "GENERATE_UUID",
+            #     "auto_populate": True,
+            #     "max_length": 32,
+            #     "type": "string"
+            # },
             # Geometry field
             {
                 "name": "wkb_geometry",
@@ -226,14 +245,6 @@ class BLDSDataset:
                 ],
                 "visible": True,
                 "alias": "StatusCurrentMapped",
-                "type": "string"
-            },
-            {
-                "name": "amigo_id",
-                "nullable": False,
-                "default": "GENERATE_UUID",
-                "auto_populate": True,
-                "max_length": 32,
                 "type": "string"
             },
             {
@@ -714,20 +725,22 @@ class BLDSDataset:
                 "type": "string"
             },
         ]
-        for column in columns:
-            self.add_column(column)
 
-    def upload_records(self, records, city):
+        final_columns = []
+        for column in columns:
+            final_columns.append({"new": column})
+        self.add_columns(final_columns)
+
+    def upload_records(self, records, action):
         insert_records = {
             "type": "DML",
             "entity": self.table_name,
-            "action": "INSERT",
+            "action": action,
             "data": records
         }
         # print insert_record
         response = self.ac.post(self.dataset['submit_change'],
                        {'change': unicode(json.dumps(insert_records), errors='ignore')})
-        print(response)
         print("Upload " + str(len(records)) + " records to " + self.table_name)
         time.sleep(10) # to prevent Error: TOO MANY REQUESTS
 
@@ -738,7 +751,7 @@ class BLDSDataset:
             blds_value = city.get_value(field_name, value, record)
             if blds_filed:
                 obj[blds_filed] = blds_value
-        u = uuid.uuid1()
+        u = uuid.uuid4()
         new_obj = {"new": obj}
         new_obj["amigo_id"] = u.hex
         return new_obj
@@ -751,8 +764,39 @@ class BLDSDataset:
                 records.append(self.get_record_obj(p, city))
                 index += 1
                 if index >= 1000:
-                    self.upload_records(records, city)
+                    self.upload_records(records, "INSERT")
                     records[:] = []
                     index = 0
         # Upload the rest of the records
-        self.upload_records(records, city)
+        self.upload_records(records, "INSERT")
+
+    def update_records(self, data):
+        records = []
+        index = 0
+        for r in data:
+            new_obj = {"new": r}
+            new_obj["amigo_id"] = r['amigo_id']
+            records.append(new_obj)
+            index += 1
+            if index >= 1000:
+                self.upload_records(records, "UPDATE")
+                records[:] = []
+                index = 0
+        # Upload the rest of the records
+        self.upload_records(records, "UPDATE")
+
+    def query_page(self, query,  limit, offset):
+        sql_url = '/users/{user_id}/projects/{project_id}/sql'.format(
+            user_id=1, project_id=self.project_id
+        )
+        rows = []
+        response = self.ac.get(sql_url, {'query': query, 'offset': offset,
+                                         'limit': limit, #'state': self.master,
+                                         'dataset_id': self.dataset_id})
+        if not offset:  # i.e. If first request
+            print('The schema of the result is:')
+            print(response['columns'])
+        fetched_rows = len(response['data'])
+        offset += fetched_rows
+        rows += response['data']
+        return rows
