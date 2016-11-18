@@ -1,6 +1,8 @@
 from cities.city import City
 
-
+"""
+PaloAltoCity class defines a dictionary for field mapping
+"""
 class PaloAltoCity(City):
 
     def __init__(self):

@@ -34,7 +34,7 @@ def main(argv):
         elif opt in ("-t", "--token"):
             api_token = arg
 
-    if do_geocode and project_id and dataset_id and api_token:
+    if do_geocode and city_name and project_id and dataset_id and api_token:
         g = Geocoder(city_name, project_id, dataset_id, api_token)
         g.geocode()
     elif city_name == "San Jose" and project_id and dataset_id and api_token:

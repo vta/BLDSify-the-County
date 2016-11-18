@@ -2,11 +2,12 @@ import json
 import string
 import time
 import uuid
-
 from amigocloud import AmigoCloud
 
+"""
+BLDSDataset class is a wrapper around AmigoCloud APIs to query, update, create schema the BLDS dataset
+"""
 class BLDSDataset:
-    """ A class to manage AmigoCloud's BLDS dataset """
 
     dataset_url = '/users/{user_id}/projects/{project_id}/datasets/{dataset_id}'
 
@@ -35,7 +36,6 @@ class BLDSDataset:
         time.sleep(5) # to prevent Error: TOO MANY REQUESTS
 
     def add_columns(self, columns_json):
-        # print("Add column: " + column_json["name"])
         print("Add columns")
         add_column = {
             "type": "DDL",
@@ -47,9 +47,13 @@ class BLDSDataset:
         response = self.ac.post(self.dataset['submit_change'],
                    {'change': json.dumps(add_column)})
 
+    """
+    create_schema() creates schema for BLDS standard dataset
+    """
     def create_schema(self):
         print("Create schema for " + self.table_name)
         columns = [
+            # amigo_id field should be already created
             # {
             #     "name": "amigo_id",
             #     "nullable": False,
@@ -791,7 +795,7 @@ class BLDSDataset:
         )
         rows = []
         response = self.ac.get(sql_url, {'query': query, 'offset': offset,
-                                         'limit': limit, #'state': self.master,
+                                         'limit': limit,
                                          'dataset_id': self.dataset_id})
         if not offset:  # i.e. If first request
             print('The schema of the result is:')

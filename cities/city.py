@@ -1,4 +1,10 @@
+"""
+City class is a base class for the cities.
+Particular city implementation need to define self.fields dictionary that maps the field names
+from a city dataset to BLDS standard
 
+ - get_value() function can be used for complicated field aggregations
+"""
 class City:
 
     def __init__(self, name, fields):
