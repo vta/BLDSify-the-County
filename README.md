@@ -1,10 +1,10 @@
 # BLDSify-the-County
 Scripts to collect a land permit data, convert it to BLDS format, and upload to a PostGIS Database.
 
-1. Document exact sources of permit data ([this may help](https://github.com/vta/GIS-Resources-Santa-Clara-County)).
-1. Script out the scraping or downloading of the permit data
-1. Process / convert into BLDS format
-1. Write to disc and/or upload to a postgis database
+1. Document exact sources of permit data across the county([this may help](https://github.com/vta/GIS-Resources-Santa-Clara-County)).
+1. Script out the downloading or scraping of the permit data.
+1. Process / convert into [BLDS format](http://permitdata.org/).
+1. Write to disc and/or upload to a postgis database.
 
 
 ## Background
