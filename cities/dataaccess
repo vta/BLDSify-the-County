@@ -1,4 +1,8 @@
-Access Palo Alto data from here:
+BLDS Building & Land Development Specification - http://permitdata.org/
+
+https://github.com/open-data-standards/permitdata.org/wiki/Core-Permits-Dataset-Requirements 
+
+Palo Alto:
 
 http://data.cityofpaloalto.org/dataviews/92560/palo-alto-development-center-permits-updated-daily/
 
@@ -7,3 +11,33 @@ Request and API key here: http://data.cityofpaloalto.org/developers/
 Current key I requested is:  e086a08fadd6f77ff3544a4c440a0129629af6c7 
 
 api call is http://paloalto.cloudapi.junar.com/api/v2/datastreams/PALO-ALTO-DEVEL-CENTE-65620/data.json/?auth_key=YOUR_API_KEY&limit=50
+
+City of San Jose
+
+https://sjpermits.org/permits/
+
+City of Santa Clara:
+
+City of Milpitas:
+
+City of Sunnyvale:
+
+City of Mountain View:
+
+County of Santa Clara:
+
+City of Campbell:
+
+City of Cupertino:
+
+Town of Los Gatos:
+
+Town of Saratoga:
+
+City of Los Altos:
+
+City of Morgan Hill:
+
+City of Gilroy:
+
+
